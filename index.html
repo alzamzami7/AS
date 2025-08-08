@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نظام الفوترة البسيط</title>
+  <style>
+    body { font-family: sans-serif; background: #f3f4f6; margin:0; padding:20px; }
+    h1 { text-align:center; color:#2c3e50; }
+    .container { max-width:600px; margin:20px auto; background:white; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+    input, button, select { width:100%; padding:10px; margin:5px 0 15px; border-radius:4px; border:1px solid #ccc; }
+    button { cursor:pointer; background:#3498db; color:white; border:none; }
+    table { width:100%; border-collapse:collapse; margin-top:15px; }
+    th, td { border:1px solid #ddd; padding:8px; text-align:right; }
+    th { background:#ecf0f1; }
+  </style>
+</head>
+<body>
+
+  <h1>نظام الفوترة المبسط</h1>
+  <div class="container">
+    <label>اسم العميل:</label>
+    <input type="text" id="client-name" placeholder="أدخل اسم العميل">
+    <label>النوع:</label>
+    <select id="type">
+      <option value="purchase">شراء (دين)</option>
+      <option value="pay">دفع (سداد)</option>
+    </select>
+    <label>الوصف:</label>
+    <input type="text" id="desc" placeholder="وصف المعاملة">
+    <label>القيمة:</label>
+    <input type="number" id="amount" placeholder="القيمة">
+    <button onclick="addTransaction()">إرسال</button>
+  </div>
+
+  <div class="container">
+    <h2>قائمة المعاملات</h2>
+    <table id="trans-table">
+      <thead><tr><th>الوصف</th><th>القيمة</th><th>النوع</th><th>العميل</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
