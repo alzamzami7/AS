@@ -1,46 +1,161 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>نظام الفوترة البسيط</title>
-  <style>
-    body { font-family: sans-serif; background: #f3f4f6; margin:0; padding:20px; }
-    h1 { text-align:center; color:#2c3e50; }
-    .container { max-width:600px; margin:20px auto; background:white; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
-    input, button, select { width:100%; padding:10px; margin:5px 0 15px; border-radius:4px; border:1px solid #ccc; }
-    button { cursor:pointer; background:#3498db; color:white; border:none; }
-    table { width:100%; border-collapse:collapse; margin-top:15px; }
-    th, td { border:1px solid #ddd; padding:8px; text-align:right; }
-    th { background:#ecf0f1; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>نظام الفوترة وإدارة الديون</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header>
+    <h1>نظام الفوترة وإدارة الديون</h1>
+    <nav>
+      <button id="btn-home" class="active">الرئيسية</button>
+      <button id="btn-clients">قائمة العملاء</button>
+      <button id="btn-about">عن التطبيق والمصمم</button>
+    </nav>
+  </header>
 
-  <h1>نظام الفوترة المبسط</h1>
-  <div class="container">
-    <label>اسم العميل:</label>
-    <input type="text" id="client-name" placeholder="أدخل اسم العميل">
-    <label>النوع:</label>
-    <select id="type">
-      <option value="purchase">شراء (دين)</option>
-      <option value="pay">دفع (سداد)</option>
-    </select>
-    <label>الوصف:</label>
-    <input type="text" id="desc" placeholder="وصف المعاملة">
-    <label>القيمة:</label>
-    <input type="number" id="amount" placeholder="القيمة">
-    <button onclick="addTransaction()">إرسال</button>
+  <main>
+    <!-- شاشة الرئيسية: تسجيل معاملة جديدة -->
+    <section id="home-screen" class="screen active">
+      <form id="transaction-form" autocomplete="off">
+        <label for="client-name">اسم العميل:</label>
+        <input type="text" id="client-name" name="client-name" placeholder="أدخل اسم العميل" required list="clients-list" />
+        <datalist id="clients-list"></datalist>
+
+        <label for="transaction-desc">تفاصيل المعاملة:</label>
+        <input type="text" id="transaction-desc" name="transaction-desc" placeholder="وصف المعاملة" required />
+
+        <label for="transaction-amount">القيمة:</label>
+        <input type="number" id="transaction-amount" name="transaction-amount" min="0.01" step="0.01" placeholder="0.00" required />
+
+        <label>نوع المعاملة:</label>
+        <div class="radio-group">
+          <label><input type="radio" name="transaction-type" value="purchase" checked /> شراء (دين)</label>
+          <label><input type="radio" name="transaction-type" value="payment" /> دفع (تسديد)</label>
+        </div>
+
+        <label for="transaction-notes">ملاحظات (اختياري):</label>
+        <textarea id="transaction-notes" name="transaction-notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
+
+        <button type="submit" id="submit-transaction">إرسال المعاملة</button>
+      </form>
+
+      <div id="user-id-display">معرف المستخدم: <span id="user-id"></span></div>
+    </section>
+
+    <!-- شاشة قائمة العملاء -->
+    <section id="clients-screen" class="screen">
+      <div class="clients-header">
+        <input type="search" id="client-search" placeholder="ابحث عن عميل..." />
+        <button id="add-client-btn">إضافة عميل جديد</button>
+      </div>
+      <ul id="clients-list-container"></ul>
+    </section>
+
+    <!-- شاشة تفاصيل العميل -->
+    <section id="client-details-screen" class="screen">
+      <header class="client-details-header">
+        <button id="back-to-clients">&larr; العودة</button>
+        <h2 id="client-details-name"></h2>
+        <button id="edit-client-name-btn">تعديل الاسم</button>
+        <button id="delete-client-btn" class="danger">حذف العميل</button>
+      </header>
+
+      <div class="filter-date">
+        <label for="filter-from-date">من تاريخ:</label>
+        <input type="date" id="filter-from-date" />
+        <label for="filter-to-date">إلى تاريخ:</label>
+        <input type="date" id="filter-to-date" />
+        <button id="filter-apply-btn">تصفية</button>
+        <button id="filter-clear-btn">مسح الفلاتر</button>
+      </div>
+
+      <ul id="transactions-list"></ul>
+
+      <form id="add-transaction-to-client-form" autocomplete="off">
+        <input type="text" id="transaction-desc-client" placeholder="وصف المعاملة" required />
+        <input type="number" id="transaction-amount-client" min="0.01" step="0.01" placeholder="القيمة" required />
+        <select id="transaction-type-client">
+          <option value="purchase">شراء (دين)</option>
+          <option value="payment">دفع (تسديد)</option>
+        </select>
+        <input type="text" id="transaction-notes-client" placeholder="ملاحظات (اختياري)" />
+        <button type="submit" id="add-transaction-client-btn">+</button>
+      </form>
+
+      <div class="client-actions">
+        <button id="calculate-total-btn">حساب الإجمالي</button>
+        <button id="export-csv-btn">تصدير البيانات (CSV)</button>
+      </div>
+
+      <div id="total-debt-display"></div>
+    </section>
+
+    <!-- شاشة تعديل اسم العميل -->
+    <section id="edit-client-name-screen" class="screen">
+      <h2>تعديل اسم العميل</h2>
+      <form id="edit-client-name-form">
+        <input type="text" id="edit-client-name-input" required />
+        <button type="submit">حفظ</button>
+        <button type="button" id="cancel-edit-client-name">إلغاء</button>
+      </form>
+    </section>
+
+    <!-- شاشة تعديل المعاملة -->
+    <section id="edit-transaction-screen" class="screen">
+      <h2>تعديل المعاملة</h2>
+      <form id="edit-transaction-form">
+        <input type="text" id="edit-transaction-desc" required />
+        <input type="number" id="edit-transaction-amount" min="0.01" step="0.01" required />
+        <select id="edit-transaction-type">
+          <option value="purchase">شراء (دين)</option>
+          <option value="payment">دفع (تسديد)</option>
+        </select>
+        <input type="text" id="edit-transaction-notes" placeholder="ملاحظات (اختياري)" />
+        <button type="submit">حفظ</button>
+        <button type="button" id="cancel-edit-transaction">إلغاء</button>
+      </form>
+    </section>
+
+    <!-- شاشة إضافة عميل جديد -->
+    <section id="add-client-screen" class="screen">
+      <h2>إضافة عميل جديد</h2>
+      <form id="add-client-form">
+        <label for="new-client-name">اسم العميل:</label>
+        <input type="text" id="new-client-name" required />
+        <label for="new-client-initial-debt">دين مبدئي (اختياري):</label>
+        <input type="number" id="new-client-initial-debt" min="0" step="0.01" />
+        <label for="new-client-initial-desc">وصف الدين المبدئي:</label>
+        <input type="text" id="new-client-initial-desc" />
+        <button type="submit">إضافة</button>
+        <button type="button" id="cancel-add-client">إلغاء</button>
+      </form>
+    </section>
+
+    <!-- شاشة عن التطبيق والمصمم -->
+    <section id="about-screen" class="screen">
+      <h2>عن التطبيق والمصمم</h2>
+      <p>هذا التطبيق من تصميم عبدالله الزمزمي.</p>
+      <button id="close-about-btn">إغلاق</button>
+    </section>
+
+  </main>
+
+  <!-- نوافذ منبثقة مودال -->
+  <div id="modal-overlay" class="hidden"></div>
+  <div id="modal" class="hidden">
+    <p id="modal-message"></p>
+    <div class="modal-buttons">
+      <button id="modal-ok-btn">موافق</button>
+      <button id="modal-cancel-btn" class="hidden">إلغاء</button>
+    </div>
   </div>
 
-  <div class="container">
-    <h2>قائمة المعاملات</h2>
-    <table id="trans-table">
-      <thead><tr><th>الوصف</th><th>القيمة</th><th>النوع</th><th>العميل</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <!-- مؤشر تحميل -->
+  <div id="loading-indicator" class="hidden">جاري المعالجة...</div>
 
-  <script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
